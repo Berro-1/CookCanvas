@@ -1,46 +1,38 @@
 <?php
-header("Access-Control-Allow-Origin: http://localhost:3000"); // Replace this with the domain from which you are sending requests
+require '../config/config.php';
+
+header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Content-Type: application/json");
 
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    exit;
-}
-require '../config/config.php';
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $rawData = file_get_contents("php://input");
+    $data = json_decode(file_get_contents("php://input"), true);
 
-    $data = json_decode($rawData, true);
+    if (isset($data['username']) && isset($data['email']) && isset($data['password'])) {
+        $username = $data['username'];
+        $email = $data['email'];
+        $password = password_hash($data['password'], PASSWORD_DEFAULT);
 
-    $email = $data['email'];
-    $password = $data['password'];
-    $username = $data['username'];
+        $sql = 'INSERT INTO users (username, email, password) VALUES (?, ?, ?)';
+        $stmt = $conn->prepare($sql);
 
-    // Hash the password
-    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-
-    // Check if email or username already exists
-    $checkEmail = $conn->prepare('SELECT * FROM users WHERE email = ? OR username = ?');
-    $checkEmail->bind_param('ss', $email, $username);
-    $checkEmail->execute();
-    $checkEmail->store_result();
-
-    if ($checkEmail->num_rows > 0) {
-        echo json_encode(["error" => "Email or Username already exists"]);
-        exit;
+        if ($stmt) {
+            $stmt->bind_param('sss', $username, $email, $password);
+            if ($stmt->execute()) {
+                echo json_encode(['status' => 'success', 'message' => 'User registered successfully']);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'Error registering user']);
+            }
+            $stmt->close();
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Failed to prepare the statement']);
+        }
     } else {
-        $stmt = $conn->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
-        $stmt->bind_param('sss', $username, $email, $hashedPassword);
-        $stmt->execute();
-        echo json_encode(["success" => "User registered successfully"]);
+        echo json_encode(['status' => 'error', 'message' => 'Username, email, or password is missing']);
     }
-
-    $checkEmail->close();
-    $stmt->close();
     $conn->close();
 } else {
-    echo json_encode(["error" => "Invalid request method"]);
-    exit;
+    echo json_encode(['status' => 'error', 'message' => 'Invalid request method']);
 }
+?>
