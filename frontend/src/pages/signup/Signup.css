@@ -1,0 +1,113 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: #f2f2f2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.signup-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(135deg, #ffffff);
+}
+
+.signup-form {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    width: 350px;
+    text-align: center;
+    transition: transform 0.3s ease-in-out;
+}
+
+.signup-form:hover {
+    transform: translateY(-5px);
+}
+
+.signup-title {
+    margin-bottom: 30px;
+    color: #ffc107;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    color: #333;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: #f9f9f9;
+    font-size: 14px;
+    transition: border-color 0.3s ease-in-out;
+}
+
+.form-group input:focus {
+    border-color: #ffc107;
+    outline: none;
+}
+
+.signup-button {
+    background-color: #ffc107;
+    color: #333;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.signup-button:hover {
+    background-color: #ffa000;
+    transform: translateY(-2px);
+}
+
+.signup-button:active {
+    background-color: #ffc107;
+    transform: translateY(0);
+}
+
+.switch-button {
+    background: none;
+    border: none;
+    color: #ffc107;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 15px;
+    transition: color 0.3s ease-in-out;
+}
+
+.switch-button:hover {
+    color: #ffa000;
+}
+
+@media (max-width: 600px) {
+    .signup-form {
+        width: 90%;
+        padding: 20px;
+    }
+}
