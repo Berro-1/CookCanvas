@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import './Signup.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Signup = () => {
     const [username, setUsername] = useState('');
@@ -12,7 +14,7 @@ const Signup = () => {
 
     const handleSubmit = async () => {
         if (password !== confirmPassword) {
-            alert('Passwords do not match');
+            toast.error('Passwords do not match', { className: 'toast-error' });
             return;
         }
 
@@ -28,14 +30,14 @@ const Signup = () => {
             const data = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
 
             if (data.status === 'success') {
-                alert('User registered successfully');
-                navigate('/');
+                toast.success('User registered successfully', { className: 'toast-success' });
+                navigate('/login');
             } else {
-                alert(data.message || 'Error registering user');
+                toast.error(data.message || 'Error registering user', { className: 'toast-error' });
             }
         } catch (error) {
             console.error('There was an error!', error);
-            alert('An error occurred. Please try again later.');
+            toast.error('An error occurred. Please try again later.', { className: 'toast-error' });
         }
     };
 
@@ -45,6 +47,7 @@ const Signup = () => {
 
     return (
         <div className="signup-container">
+            <ToastContainer />
             <form className="signup-form" onSubmit={(e) => e.preventDefault()}>
                 <h2 className="signup-title">Sign Up</h2>
                 <div className="form-group">

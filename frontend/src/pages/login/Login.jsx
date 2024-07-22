@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import './Login.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -14,18 +16,20 @@ const Login = () => {
                 email: email,
                 password: password
             });
-            console.log('Response Data:', response.data);
+            console.log('Response Data:', response.data); // Log the response data for debugging
 
+            // If response data is a string, parse it as JSON
             const data = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
 
             if (data.status === 'success') {
-                navigate('/signup');
+                toast.success('User logged in successfully', { className: 'toast-success' });
+                navigate('/home');
             } else {
-                alert(data.message || 'Invalid Credentials');
+                toast.error(data.message || 'Invalid Credentials', { className: 'toast-error' });
             }
         } catch (error) {
             console.error('There was an error!', error);
-            alert('An error occurred. Please try again later.');
+            toast.error('An error occurred. Please try again later.', { className: 'toast-error' });
         }
     };
 
@@ -35,6 +39,7 @@ const Login = () => {
 
     return (
         <div className="login-container">
+            <ToastContainer />
             <form className="login-form" onSubmit={(e) => e.preventDefault()}>
                 <h2 className="login-title">Login</h2>
                 <div className="form-group">
