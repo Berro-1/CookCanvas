@@ -3,17 +3,18 @@ import axios from 'axios';
 import './Home.css';
 import Header from '../../components/header/Header';
 import SearchBar from '../../components/searchBar/SearchBar';
-import NavMenu from '../../components/navMenu/NavMenu';
 import RecipeList from '../../components/recipeList/RecipeList';
 import Modal from '../../components/modal/Modal';
+import CreateRecipe from '../../components/createRecipe/CreateRecipe1';
 import { createFilter } from 'react-search-input';
 
 const Home = () => {
   const [recipes, setRecipes] = useState([]);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [isCreateRecipeOpen, setIsCreateRecipeOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const KEYS_TO_FILTERS = ['title', 'description', 'ingredients', 'steps.description'];
+  const KEYS_TO_FILTERS = ['title'];
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -32,11 +33,22 @@ const Home = () => {
 
   const handleRecipeClick = (recipe) => {
     setSelectedRecipe(recipe);
-    console.log(recipe);
   };
 
   const closeModal = () => {
     setSelectedRecipe(null);
+  };
+
+  const openCreateRecipe = () => {
+    setIsCreateRecipeOpen(true);
+  };
+
+  const closeCreateRecipe = () => {
+    setIsCreateRecipeOpen(false);
+  };
+
+  const handleRecipeCreated = (newRecipe) => {
+    setRecipes([...recipes, newRecipe]);
   };
 
   const handleSearchChange = (term) => {
@@ -47,7 +59,7 @@ const Home = () => {
     <div>
       <Header />
       <SearchBar searchTerm={searchTerm} onChange={handleSearchChange} />
-      <NavMenu />
+      <button className="create-recipe-button" onClick={openCreateRecipe}>Create Recipe</button>
       <div className="content">
         <h2>Popular Recipes</h2>
         <div className="popular-recipes">
@@ -55,6 +67,7 @@ const Home = () => {
         </div>
       </div>
       {selectedRecipe && <Modal recipe={selectedRecipe} onClose={closeModal} />}
+      {isCreateRecipeOpen && <CreateRecipe onClose={closeCreateRecipe} onRecipeCreated={handleRecipeCreated} />}
     </div>
   );
 };

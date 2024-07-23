@@ -6,12 +6,26 @@ header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Content-Type: application/json");
 
+$response = array("status" => "error", "message" => "Unknown error");
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $title = $_POST['title'];
-    $description = $_POST['description'];
-    $userId = $_POST['user_id'];
-    $ingredients = json_decode($_POST['ingredients'], true);
-    $steps = json_decode($_POST['steps'], true);
+    $title = $_POST['title'] ?? '';
+    $description = $_POST['description'] ?? '';
+    $userId = $_POST['user_id'] ?? '';
+    $ingredients = $_POST['ingredients'] ?? [];
+    $steps = $_POST['steps'] ?? [];
+
+    // Verify user ID exists
+    $stmt = $conn->prepare("SELECT user_id FROM users WHERE user_id = ?");
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $stmt->store_result();
+
+    if ($stmt->num_rows == 0) {
+        echo json_encode(['status' => 'error', 'message' => 'Invalid user ID']);
+        exit;
+    }
+    $stmt->close();
 
     // Handle the image upload
     $imagePath = '';
@@ -43,7 +57,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Insert recipe
         $stmt = $conn->prepare("INSERT INTO recipes (title, description, user_id, image) VALUES (?, ?, ?, ?)");
         $stmt->bind_param("ssis", $title, $description, $userId, $imagePath);
-        $stmt->execute();
+        if (!$stmt->execute()) {
+            throw new Exception("Error inserting recipe: " . $stmt->error);
+        }
         $recipeId = $stmt->insert_id;
         $stmt->close();
 
@@ -51,7 +67,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt = $conn->prepare("INSERT INTO ingredients (recipe_id, ingredient_name) VALUES (?, ?)");
         foreach ($ingredients as $ingredient) {
             $stmt->bind_param("is", $recipeId, $ingredient);
-            $stmt->execute();
+            if (!$stmt->execute()) {
+                throw new Exception("Error inserting ingredient: " . $stmt->error);
+            }
         }
         $stmt->close();
 
@@ -60,19 +78,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         foreach ($steps as $index => $step) {
             $stepNumber = $index + 1;
             $stmt->bind_param("iis", $recipeId, $stepNumber, $step);
-            $stmt->execute();
+            if (!$stmt->execute()) {
+                throw new Exception("Error inserting step: " . $stmt->error);
+            }
         }
         $stmt->close();
 
         // Commit transaction
         $conn->commit();
-        echo json_encode(['status' => 'success', 'message' => 'Recipe created successfully']);
+        $response["status"] = "success";
+        $response["message"] = "Recipe created successfully";
+        $response["recipe"] = array(
+            "recipe_id" => $recipeId,
+            "title" => $title,
+            "description" => $description,
+            "user_id" => $userId,
+            "image" => $imagePath,
+            "ingredients" => $ingredients,
+            "steps" => $steps
+        );
     } catch (Exception $e) {
         // Rollback transaction on error
         $conn->rollback();
-        echo json_encode(['status' => 'error', 'message' => 'Error creating recipe', 'error' => $e->getMessage()]);
+        $response["message"] = 'Error creating recipe';
+        $response["error"] = $e->getMessage();
     }
 }
 
 $conn->close();
+echo json_encode($response);
 ?>

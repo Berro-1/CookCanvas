@@ -139,4 +139,19 @@ body {
   .rating .off .star {
     color: #e4e5e9;
   }
+  .create-recipe-button {
+    padding: 10px 20px;
+    background-color: #ffc107;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s, color 0.3s;
+    margin: 20px;
+  }
+  
+  .create-recipe-button:hover {
+    background-color: #ffecb3;
+    color: #05161a;
+  }
   
