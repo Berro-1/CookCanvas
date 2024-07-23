@@ -6,10 +6,14 @@ import SearchBar from '../../components/searchBar/SearchBar';
 import NavMenu from '../../components/navMenu/NavMenu';
 import RecipeList from '../../components/recipeList/RecipeList';
 import Modal from '../../components/modal/Modal';
+import { createFilter } from 'react-search-input';
 
 const Home = () => {
   const [recipes, setRecipes] = useState([]);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const KEYS_TO_FILTERS = ['title', 'description', 'ingredients', 'steps.description'];
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -24,24 +28,33 @@ const Home = () => {
     fetchRecipes();
   }, []);
 
-  const handleCardClick = (recipe) => {
+  const filteredRecipes = recipes.filter(createFilter(searchTerm, KEYS_TO_FILTERS));
+
+  const handleRecipeClick = (recipe) => {
     setSelectedRecipe(recipe);
+    console.log(recipe);
   };
 
-  const handleCloseModal = () => {
+  const closeModal = () => {
     setSelectedRecipe(null);
+  };
+
+  const handleSearchChange = (term) => {
+    setSearchTerm(term);
   };
 
   return (
     <div>
       <Header />
-      <SearchBar />
+      <SearchBar searchTerm={searchTerm} onChange={handleSearchChange} />
       <NavMenu />
       <div className="content">
         <h2>Popular Recipes</h2>
-        <RecipeList recipes={recipes} onCardClick={handleCardClick} />
+        <div className="popular-recipes">
+          <RecipeList recipes={filteredRecipes} onCardClick={handleRecipeClick} />
+        </div>
       </div>
-      {selectedRecipe && <Modal recipe={selectedRecipe} onClose={handleCloseModal} />}
+      {selectedRecipe && <Modal recipe={selectedRecipe} onClose={closeModal} />}
     </div>
   );
 };

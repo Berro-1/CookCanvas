@@ -1,13 +1,16 @@
 import React from 'react';
 import { jsPDF } from 'jspdf';
+import Rating from '../rating/Rating';
+import Comments from '../comments/Comments';
 import './Modal.css';
 
 const Modal = ({ recipe, onClose }) => {
   if (!recipe) return null;
 
-  const downloadPdf = () => {
+  const downloadPdf = async () => {
     const doc = new jsPDF();
-    
+
+    // Add text to the PDF
     doc.text(recipe.title, 10, 10);
     doc.text(recipe.description, 10, 20);
 
@@ -28,22 +31,32 @@ const Modal = ({ recipe, onClose }) => {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <button className="close-button" onClick={onClose}>×</button>
-        <img src={'http://localhost/cookcanvas/backend' + recipe.image} alt={recipe.title} className="modal-image" />
+        <img src={`http://localhost/cookcanvas/backend${recipe.image}`} alt={recipe.title} className="modal-image" />
         <div className="modal-info">
           <h3>{recipe.title}</h3>
           <p>{recipe.description}</p>
+          <Rating recipeId={recipe.recipe_id} userId={localStorage.getItem('user_id')} />
           <p>Ingredients:</p>
           <ul>
-            {recipe.ingredients.map((ingredient, index) => (
-              <li key={index}>{ingredient}</li>
-            ))}
+            {recipe.ingredients && Array.isArray(recipe.ingredients) ? (
+              recipe.ingredients.map((ingredient, index) => (
+                <li key={index}>{ingredient}</li>
+              ))
+            ) : (
+              <li>No ingredients available</li>
+            )}
           </ul>
           <p>Steps:</p>
           <ul>
-            {recipe.steps.map((step) => (
-              <li key={step.step_number}>{step.description}</li>
-            ))}
+            {recipe.steps && Array.isArray(recipe.steps) ? (
+              recipe.steps.map((step) => (
+                <li key={step.step_number}>{step.description}</li>
+              ))
+            ) : (
+              <li>No steps available</li>
+            )}
           </ul>
+          <Comments recipeId={recipe.recipe_id} userId={localStorage.getItem('user_id')} />
           <button className="download-button" onClick={downloadPdf}>Download as PDF</button>
         </div>
       </div>

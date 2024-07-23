@@ -121,4 +121,22 @@ body {
     align-items: center;
     color: #ffc107;
   }
+  .rating {
+    display: flex;
+    flex-direction: row;
+  }
+  
+  .rating button {
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .rating .on .star {
+    color: #ffc107;
+  }
+  
+  .rating .off .star {
+    color: #e4e5e9;
+  }
   
