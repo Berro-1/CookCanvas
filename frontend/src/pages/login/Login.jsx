@@ -12,26 +12,23 @@ const Login = () => {
 
     const handleSubmit = async () => {
         try {
-            const response = await axios.post('http://localhost/CookCanvas/backend/users/login.php', {
-                email: email,
-                password: password
-            });
-            console.log('Response Data:', response.data); // Log the response data for debugging
-
-            // If response data is a string, parse it as JSON
-            const data = typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
-
-            if (data.status === 'success') {
-                toast.success('User logged in successfully', { className: 'toast-success' });
-                navigate('/home');
-            } else {
-                toast.error(data.message || 'Invalid Credentials', { className: 'toast-error' });
-            }
+          const response = await axios.post('http://localhost/cookcanvas/backend/users/login.php', {
+            email: email,
+            password: password,
+          });
+          console.log(response.data);
+          if (response.data.status === 'success') {
+            localStorage.setItem('user_id', response.data.user_id);
+            localStorage.setItem('username', response.data.username); 
+            navigate('/home');
+          } else {
+            alert('Invalid Credentials');
+          }
         } catch (error) {
-            console.error('There was an error!', error);
-            toast.error('An error occurred. Please try again later.', { className: 'toast-error' });
+          console.error('There was an error!', error);
+          alert('An error occurred. Please try again later.');
         }
-    };
+      };
 
     const switchToSignup = () => {
         navigate('/signup');
