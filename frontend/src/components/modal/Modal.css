@@ -94,6 +94,23 @@
   color: #05161a;
 }
 
+.download-button {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #ffc107;
+  border: none;
+  border-radius: 5px;
+  color: #333;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s, color 0.3s;
+}
+
+.download-button:hover {
+  background-color: #ffecb3;
+  color: #05161a;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

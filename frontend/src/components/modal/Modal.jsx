@@ -1,8 +1,28 @@
 import React from 'react';
+import { jsPDF } from 'jspdf';
 import './Modal.css';
 
 const Modal = ({ recipe, onClose }) => {
   if (!recipe) return null;
+
+  const downloadPdf = () => {
+    const doc = new jsPDF();
+    
+    doc.text(recipe.title, 10, 10);
+    doc.text(recipe.description, 10, 20);
+
+    doc.text('Ingredients:', 10, 30);
+    recipe.ingredients.forEach((ingredient, index) => {
+      doc.text(ingredient, 10, 40 + index * 10);
+    });
+
+    doc.text('Steps:', 10, 50 + recipe.ingredients.length * 10);
+    recipe.steps.forEach((step, index) => {
+      doc.text(`${index + 1}. ${step.description}`, 10, 60 + recipe.ingredients.length * 10 + index * 10);
+    });
+
+    doc.save(`${recipe.title}.pdf`);
+  };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -24,6 +44,7 @@ const Modal = ({ recipe, onClose }) => {
               <li key={step.step_number}>{step.description}</li>
             ))}
           </ul>
+          <button className="download-button" onClick={downloadPdf}>Download as PDF</button>
         </div>
       </div>
     </div>
