@@ -27,6 +27,17 @@ const Modal = ({ recipe, onClose }) => {
     doc.save(`${recipe.title}.pdf`);
   };
 
+  const copyUrl = () => {
+    const recipeUrl = window.location.origin + '/recipe/' + recipe.recipe_id;
+    navigator.clipboard.writeText(recipeUrl)
+      .then(() => {
+        alert('Recipe URL copied to clipboard!');
+      })
+      .catch(err => {
+        console.error('Failed to copy the text to clipboard:', err);
+      });
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -58,6 +69,7 @@ const Modal = ({ recipe, onClose }) => {
           </ul>
           <Comments recipeId={recipe.recipe_id} userId={localStorage.getItem('user_id')} />
           <button className="download-button" onClick={downloadPdf}>Download as PDF</button>
+          <button className="copy-url-button" onClick={copyUrl}>Copy Recipe URL</button>
         </div>
       </div>
     </div>
